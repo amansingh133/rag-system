@@ -1,0 +1,11 @@
+ticket_id,customer_name,subject,description,status,priority,created_date
+1001,Priya Sharma,Falcon X3 WiFi connection issue,Robot wont connect to my 5GHz WiFi network. Tried resetting multiple times.,resolved,medium,2025-04-12
+1002,Raj Kumar,Battery drains fast,Falcon X3 battery lasts only 90 minutes instead of the advertised 4 hours.,open,high,2025-04-14
+1003,Anita Singh,Refund request for Falcon X3,Want to return the Falcon X3 within 30-day return window. Product unopened.,resolved,low,2025-04-15
+1004,Mohammed Khan,Lumera Home app crashes,The Lumera Home app crashes on launch on my iPhone 14 with iOS 17.,open,high,2025-04-16
+1005,Sneha Patel,Replacement dust bin lid,Need a replacement lid for the dust bin. Original lid cracked after one month.,in-progress,medium,2025-04-17
+1006,Vikram Reddy,Warranty question,Is the internal fan motor covered under the 2-year warranty?,resolved,low,2025-04-18
+1007,Pooja Iyer,Order tracking issue,Order ORD-8821 placed 5 days ago still shows processing. Need an update.,resolved,low,2025-04-19
+1008,Arjun Mehta,Falcon X3 making loud noise,Robot makes a grinding noise when turning. Started after 3 weeks of use.,open,high,2025-04-20
+1009,Kavita Joshi,Discount code not working,Promo code WELCOME10 not applying at checkout.,resolved,low,2025-04-21
+1010,Deepak Verma,Battery replacement,Need to replace the battery on a 14-month-old Falcon X3. Covered under warranty?,in-progress,medium,2025-04-22

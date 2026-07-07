@@ -1,0 +1,14 @@
+backend/node_modules/
+backend/dist/
+backend/.env
+backend/uploads/*
+backend/!uploads/.gitkeep
+backend/*.log
+
+
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/*.log
+
+README.MD
