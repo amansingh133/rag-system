@@ -1,15 +1,24 @@
-import { HumanMessage, SystemMessage } from "@langchain/core/messages";
+import {
+  HumanMessage,
+  SystemMessage,
+  AIMessage,
+} from "@langchain/core/messages";
 import { llm } from "../../config/gemini.js";
 import { searchSimilar } from "../ingest/vectorStore.js";
 
-const SYSTEM_PROMPT = `You are an assistant that answers questions strictly using the provided context.
+const SYSTEM_PROMPT = `You are an assistant that answers questions using the provided document context and the conversation history.
 
 Rules:
-1. If the answer is not in the context, say exactly: "I don't have information about that in the uploaded documents."
-2. Do not use prior knowledge unless the user explicitly asks you to.
-3. Cite every factual claim using [Source: <filename>].
+1. For NEW factual claims, use only the document context provided below and cite it using [Source: <filename>].
+2. You MAY use the conversation history to understand follow-up questions (e.g. "the first one", "that project", "give me 2 more") — you do not need new citations to refer back to something you already said and cited earlier.
+3. If a new fact is not in the document context, say exactly: "I don't have information about that in the uploaded documents."
 4. Be concise. Prefer bullet points for lists.
-5. If the question is ambiguous, ask a clarifying question instead of guessing.`;
+5. Always respond in English, regardless of what language the question was asked in.`;
+
+export interface ChatHistoryMessage {
+  role: "user" | "assistant";
+  content: string;
+}
 
 export interface Source {
   filename: string;
@@ -23,36 +32,40 @@ export interface ChatResult {
   sources: Source[];
 }
 
-export async function answerQuestion(query: string): Promise<ChatResult> {
+export async function answerQuestion(
+  query: string,
+  history: ChatHistoryMessage[] = [],
+): Promise<ChatResult> {
   const results = await searchSimilar(query, 12);
 
-  if (results.length === 0) {
-    return {
-      answer:
-        "I don't have any documents to search. Please upload some documents first.",
-      sources: [],
-    };
-  }
+  const contextBlock =
+    results.length > 0
+      ? results
+          .map((doc) => {
+            const m = doc.metadata as any;
+            return `[Source: ${m?.filename || "unknown"}, chunk ${m?.chunkIndex ?? "?"}]\n${doc.pageContent}`;
+          })
+          .join("\n\n---\n\n")
+      : "(no matching documents found)";
 
-  // Build context with source attribution inline (the LLM only sees the prompt)
-  const contextBlock = results
-    .map((doc) => {
-      const m = doc.metadata as any;
-      return `[Source: ${m?.filename || "unknown"}, chunk ${m?.chunkIndex ?? "?"}]\n${doc.pageContent}`;
-    })
-    .join("\n\n---\n\n");
-
-  const userPrompt = `Context from uploaded documents:
+  const userPrompt = `Document context (for new facts):
 ---
 ${contextBlock}
 ---
 
-Question: ${query}
+Question: ${query}`;
 
-Answer using only the context above. Cite the source filename for every factual claim.`;
+  const historyMessages = history
+    .slice(-6)
+    .map((m) =>
+      m.role === "user"
+        ? new HumanMessage(m.content)
+        : new AIMessage(m.content),
+    );
 
   const response = await llm.invoke([
     new SystemMessage(SYSTEM_PROMPT),
+    ...historyMessages,
     new HumanMessage(userPrompt),
   ]);
 

@@ -1,19 +1,25 @@
-import { Router } from 'express';
-import { answerQuestion } from '../services/chat/chatService.js';
+import { Router } from "express";
+import {
+  answerQuestion,
+  ChatHistoryMessage,
+} from "../services/chat/chatService.js";
 
 const router = Router();
 
-router.post('/', async (req, res) => {
+router.post("/", async (req, res) => {
   try {
-    const { query } = req.body;
-    if (!query || typeof query !== 'string' || !query.trim()) {
-      return res.status(400).json({ error: 'Missing or empty query' });
+    const { query, history } = req.body;
+    if (!query || typeof query !== "string" || !query.trim()) {
+      return res.status(400).json({ error: "Missing or empty query" });
     }
-    const result = await answerQuestion(query.trim());
+    const safeHistory: ChatHistoryMessage[] = Array.isArray(history)
+      ? history
+      : [];
+    const result = await answerQuestion(query.trim(), safeHistory);
     res.json(result);
   } catch (err: any) {
-    console.error('Chat error:', err);
-    res.status(500).json({ error: err.message || 'Chat failed' });
+    console.error("Chat error:", err);
+    res.status(500).json({ error: err.message || "Chat failed" });
   }
 });
 
