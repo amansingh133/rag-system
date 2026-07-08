@@ -14,13 +14,39 @@ services:
         value: false
       - key: PORT
         value: 4000
+
+      # --- MongoDB ---
       - key: MONGODB_URI
         sync: false # Set manually in Render dashboard
-      - key: JWT_SECRET
-        generateValue: true
-      - key: REFRESH_SECRET
-        generateValue: true
-      - key: AES_KEY
-        sync: false # Must be exactly 64 hex chars — generate manually
-      - key: CLIENT_ORIGIN
-        sync: false # Your render.com URL e.g. https://owasp-demo.onrender.com
+      - key: MONGODB_DB
+        value: rag_system
+      - key: MONGODB_COLLECTION
+        value: chunks
+      - key: MONGODB_INDEX
+        value: vector_index
+
+      # --- MySQL ---
+      - key: MYSQL_HOST
+        value: false # Set manually in Render dashboard
+      - key: MYSQL_PORT
+        value: 3306
+      - key: MYSQL_USER
+        value: false # Set manually in Render dashboard
+      - key: MYSQL_PASSWORD
+        sync: false # Set manually in Render dashboard
+      - key: MYSQL_DB
+        value: ssap_aman
+
+      # --- Gemini API ---
+      - key: GEMINI_API_KEY
+        sync: false # Set manually in Render dashboard
+      - key: GEMINI_LLM_MODEL
+        value: gemini-2.5-flash
+      - key: GEMINI_EMBEDDING_MODEL
+        value: gemini-embedding-001
+
+      # --- Upload Config ---
+      - key: UPLOAD_DIR
+        value: ./uploads
+      - key: MAX_UPLOAD_MB
+        value: 50
