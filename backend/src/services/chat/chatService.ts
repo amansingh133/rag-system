@@ -24,7 +24,7 @@ export interface ChatResult {
 }
 
 export async function answerQuestion(query: string): Promise<ChatResult> {
-  const results = await searchSimilar(query, 2);
+  const results = await searchSimilar(query, 12);
 
   if (results.length === 0) {
     return {
