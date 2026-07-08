@@ -27,11 +27,11 @@ services:
 
       # --- MySQL ---
       - key: MYSQL_HOST
-        value: false # Set manually in Render dashboard
+        sync: false # Set manually in Render dashboard
       - key: MYSQL_PORT
         value: 3306
       - key: MYSQL_USER
-        value: false # Set manually in Render dashboard
+        sync: false # Set manually in Render dashboard
       - key: MYSQL_PASSWORD
         sync: false # Set manually in Render dashboard
       - key: MYSQL_DB
