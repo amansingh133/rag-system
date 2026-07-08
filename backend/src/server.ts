@@ -32,7 +32,7 @@ async function main() {
   app.use("/api/admin", adminRouter);
 
   // ── Serve React build (Single Page Application / CSR) ──────────────────────────────────
-  const PUBLIC_DIR = path.join(__dirname, "public");
+  const PUBLIC_DIR = path.join(__dirname, "..", "public");
   app.use(
     express.static(PUBLIC_DIR, {
       maxAge: process.env.NODE_ENV === "production" ? "1d" : 0,
