@@ -32,10 +32,38 @@ export interface ChatResult {
   sources: Source[];
 }
 
+// --- Simple in-memory response cache ---
+// Keyed on (normalized question + whether any history was present).
+// Avoids burning free-tier quota when re-asking the same demo questions.
+// NOT persisted — clears on server restart. Also cleared on document
+// reset so stale answers from deleted documents can't leak through.
+const responseCache = new Map<string, ChatResult>();
+
+function cacheKey(query: string, history: ChatHistoryMessage[]): string {
+  const normalized = query.trim().toLowerCase().replace(/\s+/g, " ");
+  // Only cache genuinely history-independent questions: first turn only.
+  // Follow-ups ("the first one") depend on conversation context, so they
+  // are never cached — caching those could return a stale, wrong answer.
+  const hasHistory = history.length > 0 ? "1" : "0";
+  return `${hasHistory}::${normalized}`;
+}
+
+export function clearChatCache(): void {
+  responseCache.clear();
+}
+
 export async function answerQuestion(
   query: string,
   history: ChatHistoryMessage[] = [],
 ): Promise<ChatResult> {
+  const key = cacheKey(query, history);
+
+  // Only serve from cache for standalone (no-history) questions —
+  // safest case, since the answer can't depend on conversation context.
+  if (history.length === 0 && responseCache.has(key)) {
+    return responseCache.get(key)!;
+  }
+
   const results = await searchSimilar(query, 12);
 
   const contextBlock =
@@ -84,5 +112,11 @@ Question: ${query}`;
     };
   });
 
-  return { answer, sources };
+  const result: ChatResult = { answer, sources };
+
+  if (history.length === 0) {
+    responseCache.set(key, result);
+  }
+
+  return result;
 }

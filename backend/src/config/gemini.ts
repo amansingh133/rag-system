@@ -13,4 +13,5 @@ export const llm = new ChatGoogleGenerativeAI({
   apiKey: env.GEMINI_API_KEY,
   model: env.GEMINI_LLM_MODEL,
   temperature: 0.2,
+  maxRetries: 0,
 });
